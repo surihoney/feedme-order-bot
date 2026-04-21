@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { insertOrder } from '../utils/queue';
+import { insertOrder, reinsertCancelledOrder } from '../utils/queue';
 import { Order, OrderType } from '../store/types';
 
 let nextId = 1;
@@ -70,5 +70,46 @@ describe('insertOrder', () => {
             inserted.push(o);
         }
         expect(ids(queue)).toEqual(ids(inserted));
+    });
+});
+
+describe('reinsertCancelledOrder', () => {
+    it('places a returned VIP ahead of later VIPs (by id)', () => {
+        const v1 = { ...makeOrder('VIP'), id: 1 } as Order;
+        const v3 = { ...makeOrder('VIP'), id: 3 } as Order;
+        const queue: Order[] = [v3];
+        const result = reinsertCancelledOrder(queue, v1);
+        expect(ids(result)).toEqual([1, 3]);
+    });
+
+    it('places a returned VIP behind earlier VIPs and ahead of NORMALs', () => {
+        const v1 = { ...makeOrder('VIP'), id: 1 } as Order;
+        const v2 = { ...makeOrder('VIP'), id: 2 } as Order;
+        const n4 = { ...makeOrder('NORMAL'), id: 4 } as Order;
+        const queue: Order[] = [v1, n4];
+        const result = reinsertCancelledOrder(queue, v2);
+        expect(ids(result)).toEqual([1, 2, 4]);
+    });
+
+    it('places a returned NORMAL behind all VIPs and ahead of newer NORMALs', () => {
+        const v5 = { ...makeOrder('VIP'), id: 5 } as Order;
+        const n2 = { ...makeOrder('NORMAL'), id: 2 } as Order;
+        const n3 = { ...makeOrder('NORMAL'), id: 3 } as Order;
+        const queue: Order[] = [v5, n3];
+        const result = reinsertCancelledOrder(queue, n2);
+        expect(ids(result)).toEqual([5, 2, 3]);
+    });
+
+    it('appends when nothing in the queue outranks it', () => {
+        const v1 = { ...makeOrder('VIP'), id: 1 } as Order;
+        const v2 = { ...makeOrder('VIP'), id: 2 } as Order;
+        const queue: Order[] = [v1];
+        const result = reinsertCancelledOrder(queue, v2);
+        expect(ids(result)).toEqual([1, 2]);
+    });
+
+    it('handles an empty queue', () => {
+        const v1 = { ...makeOrder('VIP'), id: 1 } as Order;
+        expect(reinsertCancelledOrder([], v1)).toEqual([v1]);
     });
 });

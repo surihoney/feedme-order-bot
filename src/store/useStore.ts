@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { AppState, Order } from './types';
-import { insertOrder } from '../utils/queue';
+import { insertOrder, reinsertCancelledOrder } from '../utils/queue';
 import { startJob, cancelJob } from './scheduler';
 
 const ORDER_DURATION_MS = 10_000;
@@ -158,7 +158,7 @@ export const useStore = create<AppState>((set, get) => {
                 return {
                     bots: nextBots,
                     orders: [
-                        ...insertOrder(pending, resetOrder),
+                        ...reinsertCancelledOrder(pending, resetOrder),
                         ...others,
                     ],
                 };

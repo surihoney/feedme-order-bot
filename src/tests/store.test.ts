@@ -271,7 +271,7 @@ describe('Requirement 6: removeBot destroys the newest bot and re-queues its ord
         expect(queue.find((o) => o.id === 1)?.type).toBe('NORMAL');
     });
 
-    it('a VIP order returned to PENDING sits ahead of NORMALs but behind other VIPs', () => {
+    it('a returned VIP keeps its original position ahead of later VIPs', () => {
         const s = useStore.getState();
         s.addOrder('VIP');
         s.addOrder('NORMAL');
@@ -285,7 +285,38 @@ describe('Requirement 6: removeBot destroys the newest bot and re-queues its ord
 
         const queue = pending();
         expect(types(queue)).toEqual(['VIP', 'VIP', 'NORMAL']);
-        expect(queue.map((o) => o.id)).toEqual([3, 1, 2]);
+        expect(queue.map((o) => o.id)).toEqual([1, 3, 2]);
+    });
+
+    it('a returned NORMAL keeps its original position ahead of later NORMALs', () => {
+        const s = useStore.getState();
+        s.addOrder('NORMAL');
+        s.addBot();
+
+        expect(processing()[0].id).toBe(1);
+
+        s.addOrder('NORMAL');
+        s.addOrder('NORMAL');
+        s.removeBot();
+
+        const queue = pending();
+        expect(types(queue)).toEqual(['NORMAL', 'NORMAL', 'NORMAL']);
+        expect(queue.map((o) => o.id)).toEqual([1, 2, 3]);
+    });
+
+    it('a returned order still sits behind any existing higher-priority orders', () => {
+        const s = useStore.getState();
+        s.addOrder('NORMAL');
+        s.addBot();
+
+        expect(processing()[0].id).toBe(1);
+
+        s.addOrder('VIP');
+        s.removeBot();
+
+        const queue = pending();
+        expect(types(queue)).toEqual(['VIP', 'NORMAL']);
+        expect(queue.map((o) => o.id)).toEqual([2, 1]);
     });
 });
 
