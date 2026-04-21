@@ -1,6 +1,8 @@
 # FeedMe Order Bot — McDonald's Cooking Bot Controller
 
-A frontend prototype of McDonald's automated cooking bot order controller
+A frontend prototype of McDonald's automated cooking bot order controller.
+
+**Live Demo:** [feedme-order-bot.vercel.app](https://feedme-order-bot.vercel.app/)
 
 ## Overview
 
