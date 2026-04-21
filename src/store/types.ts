@@ -12,6 +12,7 @@ export interface Order {
     createdAt: number;
     startedAt?: number;
     duration?: number;
+    completedAt?: number;
 }
 
 export interface Bot {

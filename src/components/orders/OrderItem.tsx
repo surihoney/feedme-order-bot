@@ -1,3 +1,4 @@
+import { timeAgo } from '@surihoney/time-ago';
 import { Order } from '../../store/types';
 import { useNow } from '../../hooks/useNow';
 import { getRemainingTime } from '../../utils/time';
@@ -47,6 +48,15 @@ export function OrderItem({ order }: Props) {
             {order.status === 'PROCESSING' && (
                 <span style={{ color: '#555', fontVariantNumeric: 'tabular-nums' }}>
                     ⏱ {Math.ceil(remaining / 1000)}s
+                </span>
+            )}
+
+            {order.status === 'COMPLETED' && order.completedAt !== undefined && (
+                <span
+                    style={{ color: '#22a06b', fontSize: 12 }}
+                    title={new Date(order.completedAt).toLocaleString()}
+                >
+                    ✓ {timeAgo(order.completedAt)}
                 </span>
             )}
         </div>

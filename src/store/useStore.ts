@@ -7,6 +7,7 @@ const ORDER_DURATION_MS = 10_000;
 
 export const useStore = create<AppState>((set, get) => {
     const completeOrder = (orderId: number, botId: number) => {
+        const completedAt = Date.now();
         set((state) => ({
             orders: state.orders.map((o) =>
                 o.id === orderId
@@ -15,6 +16,7 @@ export const useStore = create<AppState>((set, get) => {
                           status: 'COMPLETED',
                           startedAt: undefined,
                           duration: undefined,
+                          completedAt,
                       }
                     : o,
             ),
