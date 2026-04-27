@@ -2,8 +2,6 @@
 
 A frontend prototype of McDonald's automated cooking bot order controller.
 
-**Live Demo:** [feedme-order-bot.vercel.app](https://feedme-order-bot.vercel.app/)
-
 ## Overview
 
 Customers submit orders (Normal or VIP), bots pick them up from the **PENDING** queue, process each order for 10 seconds, and move it to **COMPLETE**. Managers can scale the bot fleet up or down at any time, and the app respects VIP priority and order-return semantics when bots are removed mid-process.
